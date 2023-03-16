@@ -12,13 +12,9 @@
 - name: Deploy nodejs app
   hosts: 104.248.31.172
   tasks: 
-    - name: Copy nodejs folder to a server 
-      copy:
-        src: /home/ebeh/projects/ansible/simple-nodejs/nodejs-app-1.0.0.tgz
-        dest: /root/app-1.0.0.tgz
-    - name: Unpack the nodejs file 
-      unarchive: 
+      - name: Unpack the nodejs file 
+        unarchive: 
         src: /home/ebeh/projects/ansible/simple-nodejs/nodejs-app-1.0.0.tgz
         dest: /root/ 
-        remote_src: yes
+        
   
