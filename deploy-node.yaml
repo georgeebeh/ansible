@@ -1,27 +1,44 @@
 ---
 - name: Install node and npm 
-  hosts: 104.248.31.172
+  hosts: 159.65.24.16
   tasks: 
     - name: Update apt repo and cache 
-      apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+      apt: update_cache=yes force_apt_get=yes cache_valid_time=360
     - name: Install nodejs and npm 
       apt: 
         pkg:
           - nodejs
           - npm 
+
+- name: Create new linux user for node app 
+  hosts: 159.65.24.16
+  tasks: 
+    - name: Create linux user
+      user:
+        name: george
+        comment: george admin
+        group: admin 
+      register: user_creation_result
+    - debug: msg={{user_creation_result}}    
+
+
 - name: Deploy nodejs app
-  hosts: 104.248.31.172
+  hosts: 159.65.24.16
+  become: True
+  become_user: george 
   tasks: 
     - name: Unpack the nodejs file 
       unarchive: 
-        src: /home/ebeh/projects/ansible/simple-nodejs/nodejs-app-1.0.0.tgz
-        dest: /root/ 
+        src: "{{location}}/nodejs-app-{{version}}.tgz"
+        dest: "{{destination}}" 
+      register: user_creation_result
+    - debug: msg={{user_creation_result.uid}}   
     - name: Install dependencies
       npm: 
-        path: /root/package
+        path: "{{destination}}/package"
     - name: Start the application
       command: 
-        chdir: /root/package/app
+        chdir: "{{destination}}/package/app"
         cmd: node server
       async: 1000
       poll: 0   
